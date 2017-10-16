@@ -103,16 +103,27 @@ mock.play() {
     fi
 }
 
-# This only works with commands, not alias/functions/builtins
+# This only works with commands/builtins, not alias/functions
 mock.record() {
     local fn ret
     fn="$(mock.unique-filename "$@")"
+    # works for commands/builtins
     command $@ 1>"$fn.out" 2>"$fn.err"
+    # local func="$1"
+    # shift
+    # mock.__$func "$@"
     ret=$?
     echo "$ret" >"$fn.status"
     cat "$fn.out"
     cat "$fn.err"
     return $ret
+}
+
+# $1  function name
+func.body() {
+    declare -f "$1" \
+        | tail -n +3 \
+        | head -n +2
 }
 
 vcr.run() {
@@ -124,6 +135,9 @@ vcr.run() {
 
 vcr() {
     mock.backup-command "$1"
+    # eval "function mock.__$1() { command $1 \$@; }"
+    # eval "function mock.__$1() { $(func.body "$1") }"
+    # eval "function mock.__$1() { ${BASH_ALIASES[$1]} }"
     eval "function $1() { vcr.run $1 \"\$@\"; }"
 }
 
