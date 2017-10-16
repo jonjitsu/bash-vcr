@@ -12,6 +12,11 @@ teardown() {
     rm -rf "$TEST_TEMPDIR"
 }
 
+# @test "envdump" {
+#     set | grep -P '^BATS'
+#     false
+# }
+
 @test "bats: can create functions from within tests" {
     abc() { echo hi; }
     run abc
@@ -22,6 +27,35 @@ teardown() {
     alias abc="echo 123"
     eval "alias abc=echo"
     ! type abc
+}
+
+@test "vcr() works with commands" {
+    vcr date
+    run date +%s
+    [[ $status -eq 0 ]]
+    [[ $output =~ [1-9]+ ]]
+    local firstpass="$output"
+    for i in {1..11}; do
+        sleep 0.1
+        run date +%s
+        [[ $output == $firstpass ]]
+    done
+}
+
+@test "vcr() works with builtins" {
+    JAW1=123
+    vcr set
+    local output1="$(set | grep JAW)"
+    echo $output1
+    JAW1=321
+    JAW2=321
+    local output2="$(set | grep JAW)"
+    echo $output2
+    [[ $output1 == $output2 ]]
+    unmock set
+    local output2="$(set | grep JAW)"
+    echo $output2
+    [[ $output1 != $output2 ]]
 }
 
 @test "mock() can mock non-existant commands" {
@@ -64,7 +98,7 @@ teardown() {
     diff data.err actual.err
 }
 
-@test "unmock()" {
+@test "unmock() restores non-existant commands" {
     ! type mycommand
     mock mycommand
     type mycommand
@@ -74,8 +108,11 @@ teardown() {
 
 @test "unmock() restores functions" {
     function myfunc() { echo ORIGINAL; }
+    run myfunc
+    [[ $status -eq 0 ]]
+    [[ $output == "ORIGINAL" ]]
     mock -o TESTOUT myfunc
-    echo "${__MOCK_BACKUPS[@]}"
+    echo "[${__MOCK_BACKUPS[@]}]"
     run myfunc
     [[ $status -eq 0 ]]
     [[ $output == "TESTOUT" ]]
@@ -85,13 +122,30 @@ teardown() {
     [[ $status -eq 0 ]]
     [[ $output == "ORIGINAL" ]]
 }
-# for f in *; do
-#     echo
-#     echo [$f]
-#     cat -n $f
-# done
-# echo
-# echo ---
+
+@test "mock.exists()" {
+    ! mock.exists funkyfunc
+    mock -o TEST funkyfunc
+    mock.exists funkyfunc
+}
+
+@test "mock.record()" {
+    run mock.record date +%s
+    [[ $status -eq 0 ]]
+    local firstpass="$output"
+    for i in {1..11}; do
+        sleep 0.1
+        run mock.play date +%s
+        echo 1st: $firstpass
+        echo out: $output
+        [[ $status -eq 0 ]]
+        [[ $output == $firstpass ]]
+    done
+}
+
+@test "mock.backup-command() does nothing on non-existant command" {
+    mock.backup-command alkjasdflkj
+}
 
 @test "backup/restore-command()" {
     ! type testfun
