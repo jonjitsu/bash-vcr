@@ -63,7 +63,7 @@ mock() {
     eval "function $1() { mock.play $1 \"\$@\"; }"
 }
 
-unmock() {
+mock.unmock() {
     unset -f "$1"
     mock.restore-command "$1"
 }
@@ -142,7 +142,7 @@ vcr() {
 }
 
 vcr.eject() {
-    unmock "$1"
+    mock.unmock "$1"
 }
 
 # vcr aws

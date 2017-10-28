@@ -52,7 +52,7 @@ teardown() {
     local output2="$(set | grep JAW)"
     echo $output2
     [[ $output1 == $output2 ]]
-    unmock set
+    mock.unmock set
     local output2="$(set | grep JAW)"
     echo $output2
     [[ $output1 != $output2 ]]
@@ -98,15 +98,15 @@ teardown() {
     diff data.err actual.err
 }
 
-@test "unmock() restores non-existant commands" {
+@test "mock.unmock() restores non-existant commands" {
     ! type mycommand
     mock mycommand
     type mycommand
-    unmock mycommand
+    mock.unmock mycommand
     ! type mycommand
 }
 
-@test "unmock() restores functions" {
+@test "mock.unmock() restores functions" {
     function myfunc() { echo ORIGINAL; }
     run myfunc
     [[ $status -eq 0 ]]
@@ -116,7 +116,7 @@ teardown() {
     run myfunc
     [[ $status -eq 0 ]]
     [[ $output == "TESTOUT" ]]
-    unmock myfunc
+    mock.unmock myfunc
     run myfunc
     echo $output
     [[ $status -eq 0 ]]
@@ -147,7 +147,7 @@ teardown() {
     mock.backup-command alkjasdflkj
 }
 
-@test "backup/restore-command()" {
+@test "mock.backup-command/restore-command()" {
     ! type testfun
     testfun() { echo TESTVALUE; }
     testfun | grep -P ^TESTVALUE
@@ -158,7 +158,7 @@ teardown() {
     testfun | grep -P ^TESTVALUE
 }
 
-@test "unique-filename() generates consistent filenames" {
+@test "mock.unique-filename() generates consistent filenames" {
     run mock.unique-filename aws s3 ls
     [[ $status -eq 0 ]]
     local previous="$output"
@@ -167,7 +167,7 @@ teardown() {
     [[ $output == $previous ]]
 }
 
-@test "unique-filename() produces valid filenames" {
+@test "mock.unique-filename() produces valid filenames" {
     run mock.unique-filename aws s3 ls
     [[ $output =~ [A-Za-z0-9]+ ]]
 }
