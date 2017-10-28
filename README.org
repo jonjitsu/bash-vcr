@@ -1,0 +1,51 @@
+* Overview
+Consists of utilities that can be used for mocking or automocking commands/programs/functions/aliases.
+
+* Examples
+:PROPERTIES:
+:header-args: :results drawer
+:END:
+
+#+BEGIN_SRC bash :session example1 :results none
+  source mock.sh
+  cd $(mktemp -d)
+  mkdir -p tests/mocks
+#+END_SRC
+
+
+#+BEGIN_SRC bash :session example1
+cat <<EOF >mock.output
+2017-01-18 09:29:01 elasticbeanstalk-us-west-2-185317077653
+2017-03-16 23:46:29 jaw-cf-pipeline2
+2017-08-03 10:41:56 jaw-home
+2017-08-14 16:50:03 jaw-test-bucket
+2017-10-23 00:38:45 jawjaw
+EOF
+mock -o mock.output aws s3 ls
+aws s3 ls
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+
+2017-01-18 09:29:01 elasticbeanstalk-us-west-2-185317077653
+2017-03-16 23:46:29 jaw-cf-pipeline2
+2017-08-03 10:41:56 jaw-home
+2017-08-14 16:50:03 jaw-test-bucket
+2017-10-23 00:38:45 jawjaw
+:END:
+
+#+BEGIN_SRC bash :session example1
+mock.unmock aws
+aws s3 ls 
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+
+2017-01-18 09:29:01 elasticbeanstalk-us-west-2-185317077653
+2017-03-16 23:46:29 jaw-cf-pipeline2
+2017-08-03 10:41:56 jaw-home
+2017-08-14 16:50:03 jaw-test-bucket
+2017-10-23 00:38:45 jawjaw
+:END:

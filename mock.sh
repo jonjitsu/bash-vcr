@@ -24,13 +24,16 @@ mock.unique-filename() {
 
 declare -A __MOCK_BACKUPS
 mock.backup-command() {
-    case "$(type -t "$1")" in
-        alias)    __MOCK_BACKUPS[$1]="$(alias "$1")"
-                  unalias "$1";;
-        function) __MOCK_BACKUPS[$1]="$(declare -f "$1")"
-                  unset -f "$1";;
-        *) true;;
-    esac
+    if [[ -z "${__MOCK_BACKUPS[$1]}" ]]
+    then
+        case "$(type -t "$1")" in
+            alias)    __MOCK_BACKUPS[$1]="$(alias "$1")"
+                      unalias "$1";;
+            function) __MOCK_BACKUPS[$1]="$(declare -f "$1")"
+                      unset -f "$1";;
+            *) true;;
+        esac
+    fi
 }
 
 mock.restore-command() {

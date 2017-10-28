@@ -147,6 +147,17 @@ teardown() {
     mock.backup-command alkjasdflkj
 }
 
+@test "mock.backup-command() does nothing when command already backed up" {
+    function myfunc() { echo ORIGINAL; }
+    mock.backup-command myfunc
+    local first="${__MOCK_BACKUPS[@]}"
+    function myfunc() { echo NEWONE; }
+    mock.backup-command myfunc
+    local last="${__MOCK_BACKUPS[@]}"
+    echo "[$first]==[$last]"
+    [[ $first == $last ]]
+}
+
 @test "mock.backup-command/restore-command()" {
     ! type testfun
     testfun() { echo TESTVALUE; }

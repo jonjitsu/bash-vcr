@@ -3,7 +3,7 @@
 .PHONY: run-tests run-linter
 
 bats:
-	git clone git@github.com:jonjitsu/bats.git bats || true
+	git clone https://github.com/jonjitsu/bats.git || true
 
 run-tests: bats
 	docker run --rm -it \
