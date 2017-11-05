@@ -41,7 +41,7 @@ mock.restore-command() {
 }
 
 mock() {
-    local stderr stdout status=0 cmd
+    local stderr stdout status=0
     local fn
     while true; do
         case "$1" in
@@ -111,7 +111,7 @@ mock.record() {
     local fn ret
     fn="$(mock.unique-filename "$@")"
     # works for commands/builtins
-    command $@ 1>"$fn.out" 2>"$fn.err"
+    command "$@" 1>"$fn.out" 2>"$fn.err"
     # local func="$1"
     # shift
     # mock.__$func "$@"
