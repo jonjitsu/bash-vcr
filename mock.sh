@@ -31,7 +31,7 @@ mock.backup-command() {
                       unalias "$1";;
             function) __MOCK_BACKUPS[$1]="$(declare -f "$1")"
                       unset -f "$1";;
-            *) true;;
+            *) __MOCK_BACKUPS[$1]="true" ;;
         esac
     fi
 }

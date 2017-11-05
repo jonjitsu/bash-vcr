@@ -58,6 +58,23 @@ teardown() {
     [[ $output1 != $output2 ]]
 }
 
+@test "mock() when called twice on a command does not backup the mock the second time" {
+    local type1 type2
+    type1="$(type df)"
+    mock -s 12 df
+    local first="${__MOCK_BACKUPS[@]}"
+    mock -s 13 df
+    local last="${__MOCK_BACKUPS[@]}"
+    echo "[$first]==[$last]"
+    [[ $first == $last ]]
+    run df
+    [[ -z $output ]]
+    [[ $status -eq 13 ]]
+    mock.unmock df
+    type2="$(type df)"
+    [[ $type1 == $type2 ]]
+}
+
 @test "mock() can mock non-existant commands" {
     mock doesnotexist
     type doesnotexist
