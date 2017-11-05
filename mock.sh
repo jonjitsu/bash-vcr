@@ -13,10 +13,19 @@ mock.set-dir() {
     __MOCKS_DIR="$1"
 }
 
+mock.ignore-test-names() {
+    __MOCKS_IGNORE_TEST_NAME=1
+}
+
+mock.acknowledge-test-names() {
+    __MOCKS_IGNORE_TEST_NAME=0
+}
+
+
 mock.unique-filename() {
     echo -n "$__MOCKS_DIR"/
     # make it unique per test when running in bats environment
-    if [[ -n $BATS_TEST_NAME ]]
+    if [[ $__MOCKS_IGNORE_TEST_NAME != 1 ]] && [[ -n $BATS_TEST_NAME ]]
     then echo -n "${BATS_TEST_NAME}-"
     fi
     md5sum <<<"$@" | awk '{print $1}'

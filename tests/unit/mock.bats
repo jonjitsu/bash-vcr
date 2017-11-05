@@ -199,3 +199,18 @@ teardown() {
     run mock.unique-filename aws s3 ls
     [[ $output =~ [A-Za-z0-9]+ ]]
 }
+
+@test "mock.ignore-test-name/acknowledge-test-name changes mock filenames to ignore/acknowledge test names" {
+    run mock.unique-filename aws s3 ls
+    local initial="$output"
+    mock.ignore-test-names
+    run mock.unique-filename aws s3 ls
+    local notestname="$output"
+    mock.acknowledge-test-names
+    run mock.unique-filename aws s3 ls
+    local final="$output"
+    echo [$initial] [$notestname] [$final]
+    [[ $initial == $final ]]
+    [[ $initial != $notestname ]]
+    false
+}
