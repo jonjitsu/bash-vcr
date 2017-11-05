@@ -11,6 +11,9 @@ mock.warn() {
 
 mock.set-dir() {
     __MOCKS_DIR="$1"
+    if [[ ! -e "$1" ]]
+    then mkdir -p "$1"
+    fi
 }
 
 mock.ignore-test-names() {
